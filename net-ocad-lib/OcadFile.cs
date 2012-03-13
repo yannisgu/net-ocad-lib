@@ -33,9 +33,12 @@ namespace net_ocad_lib
             FileStream fs = File.OpenRead(filename);
             //Read header
             OcadFileType.Ocad8FileHeader header = ConvertHelpers.FromStream<OcadFileType.Ocad8FileHeader>(fs);
+            //Read SYmbolheader
+            OcadFileType.Ocad8SymHeader symheader = OcadFileType.Ocad8SymHeader.ReadFromStream(fs);// ConvertHelpers.FromStream<OcadFileType.Ocad8SymHeader>(fs);
 
-            fs.Seek(header.FirstSymbolIndexBlock, SeekOrigin.Begin);
             //Read symbolindexes
+            fs.Seek(header.FirstSymbolIndexBlock, SeekOrigin.Begin);
+            
             List<int> symbolIndexes = new List<int>();
             bool more = false;
             do
