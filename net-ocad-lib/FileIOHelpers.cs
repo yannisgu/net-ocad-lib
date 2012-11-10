@@ -32,6 +32,12 @@ namespace net_ocad_lib
             return BitConverter.ToInt32(data, 0);
         }
 
+        public static bool ReadBoolFromStream(Stream s)
+        {
+            byte[] data = ReadBytesFromStream(s, 1);
+            return BitConverter.ToBoolean(data, 0);
+        }
+
         public static short ReadInt16FromStream(Stream s)
         {
             byte[] data = ReadBytesFromStream(s, 2);
@@ -48,7 +54,7 @@ namespace net_ocad_lib
         {
             byte[] data = ReadBytesFromStream(s, 32);
             int numChars = (int)data[0];
-            return System.Text.Encoding.ASCII.GetString(data.Skip(1).Take(numChars).ToArray());
+            return System.Text.Encoding.GetEncoding(1252).GetString(data.Skip(1).Take(numChars).ToArray());
         }
     }
 }

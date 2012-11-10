@@ -53,7 +53,7 @@ namespace net_ocad_lib.Loaders
             byte flags = FileIOHelpers.ReadBytesFromStream(fs, 1)[0];
             bs.Extent = FileIOHelpers.ReadInt16FromStream(fs);
 
-            byte[] selected = FileIOHelpers.ReadBytesFromStream(fs, 2);
+            bool selected = FileIOHelpers.ReadBoolFromStream(fs);
             byte status = FileIOHelpers.ReadBytesFromStream(fs, 1)[0];
             int res2 = FileIOHelpers.ReadInt16FromStream(fs);
             int res3 = FileIOHelpers.ReadInt16FromStream(fs);

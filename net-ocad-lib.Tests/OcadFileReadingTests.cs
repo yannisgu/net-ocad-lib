@@ -45,6 +45,9 @@ namespace net_ocad_lib.Tests
             var symbols = Ocad8Loader.ReadSymbols(fs, symbolIdx);
             Assert.AreEqual(161, symbols.Count);
 
+            Assert.AreEqual("Höjdkurva", symbols[0].Description);
+            Assert.AreEqual(1010, symbols[0].SymbolNumber);
+
             Assert.AreEqual(52, symbols.Where(x => x is PointSymbol).Count());
             Assert.AreEqual(63, symbols.Where(x => x is LineSymbol).Count());
             Assert.AreEqual(30, symbols.Where(x => x is AreaSymbol).Count());
@@ -54,6 +57,7 @@ namespace net_ocad_lib.Tests
             
             fs.Close();
         }
+
 
         [Test]
         [ExpectedException(ExpectedException=typeof(IOException))]
