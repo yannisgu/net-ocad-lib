@@ -43,6 +43,22 @@ namespace net_ocad_lib.Tests
             Assert.AreEqual(161, symbolIdx.Count);
 
             var symbols = Ocad8Loader.ReadSymbols(fs, symbolIdx);
+            VerifySymbolsInElseholm(symbols);
+            fs.Close();
+        }
+
+        [Test]
+        public void TestReadOcad8FileSymbolsFromFile()
+        {
+            string testfile = getPathToTestfile("TestFiles\\Elseholm.ocd");
+
+            IOcadFile of = OcadFile.OpenFile(testfile);
+
+            VerifySymbolsInElseholm(of.Symbols.ToList());
+        }
+
+        private static void VerifySymbolsInElseholm(List<BaseSymbol> symbols)
+        {
             Assert.AreEqual(161, symbols.Count);
 
             Assert.AreEqual("Höjdkurva", symbols[0].Description);
@@ -54,8 +70,7 @@ namespace net_ocad_lib.Tests
             Assert.AreEqual(14, symbols.Where(x => x is TextSymbol).Count());
             Assert.AreEqual(0, symbols.Where(x => x is LineTextSymbol).Count());
             Assert.AreEqual(2, symbols.Where(x => x is RectangleSymbol).Count());
-            
-            fs.Close();
+
         }
 
 

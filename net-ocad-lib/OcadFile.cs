@@ -9,7 +9,7 @@ namespace net_ocad_lib
 {
     public class OcadFile : IOcadFile
     {
-        public static OcadFile OpenFile(string filename)
+        public static IOcadFile OpenFile(string filename)
         {
             int majorversion = OcadFileLoader.GetFileMajorVersion(filename);
             if (majorversion != 10 && majorversion > 8)
@@ -19,7 +19,7 @@ namespace net_ocad_lib
             IOcadFile file = loader.Load(filename);
 
 
-            return null;
+            return file;
         }
 
         public BaseSymbol[] Symbols { get; set; }
