@@ -52,6 +52,7 @@
     <Compile Include="OcadFileType\ISymbolIndexBlock.cs" />
     <Compile Include="OcadFileType\Ocad8Types.cs" />
     <Compile Include="OcadFileType\Ocad10Types.cs" />
+    <Compile Include="OcadFileType\ObjectIndex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

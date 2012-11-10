@@ -23,5 +23,6 @@ namespace net_ocad_lib
         }
 
         public BaseSymbol[] Symbols { get; set; }
+        public ObjectIndex[] ObjectIndexes { get; set; }
     }
 }

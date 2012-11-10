@@ -26,6 +26,9 @@ namespace net_ocad_lib.Loaders
             //Read symbolindexes
             List<int> symIndexes = ReadSymbolIndexes<Ocad8SymbolIndexBlock>(fs, header.FirstSymbolIndexBlock);
             file.Symbols = ReadSymbols(fs, symIndexes).ToArray();
+
+            file.ObjectIndexes = ReadObjectIndexes(fs, header.ObjectIndexBlock).ToArray();
+
             fs.Close();
 
             return file;
@@ -70,9 +73,18 @@ namespace net_ocad_lib.Loaders
 
             if (bs is PointSymbol)
                 readPointSymbol(bs, fs);
+            else if (bs is LineSymbol)
+                readLineSymbol(bs, fs);
 
             return bs;
         }
+
+        private static void readLineSymbol(BaseSymbol bs, FileStream fs)
+        {
+            int col = FileIOHelpers.ReadInt16FromStream(fs);
+            (bs as LineSymbol).LineWidth = FileIOHelpers.ReadInt16FromStream(fs);
+        }
+
 
         private static void readPointSymbol(BaseSymbol bs, FileStream fs)
         {

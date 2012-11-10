@@ -57,6 +57,16 @@ namespace net_ocad_lib.Tests
             VerifySymbolsInElseholm(of.Symbols.ToList());
         }
 
+        [Test]
+        public void TestReadOcad8FileObjectFromFile()
+        {
+            string testfile = getPathToTestfile("TestFiles\\Elseholm.ocd");
+
+            IOcadFile of = OcadFile.OpenFile(testfile);
+
+            Assert.AreEqual(389, of.ObjectIndexes.Count());
+        }
+
         private static void VerifySymbolsInElseholm(List<BaseSymbol> symbols)
         {
             Assert.AreEqual(161, symbols.Count);

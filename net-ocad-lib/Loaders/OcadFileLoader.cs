@@ -55,10 +55,59 @@ namespace net_ocad_lib.Loaders
                     more = true;
                     fs.Seek(symIdx.NextSymbolIndexBlock, SeekOrigin.Begin);
                 }
+                else
+                {
+                    more = false;
+                }
 
             } while (more);
 
             return symbolIndexes;
+        }
+
+        public static List<ObjectIndex> ReadObjectIndexes(FileStream fs, int firstObjectIndexBlock)
+        {
+            fs.Seek(firstObjectIndexBlock, SeekOrigin.Begin);
+
+            List<ObjectIndex> objectIndexes = new List<ObjectIndex>();
+            bool more = false;
+            do
+            {
+                more = false;
+                long nextIdxBlock = FileIOHelpers.ReadInt32FromStream(fs);
+
+                for (int i = 0; i < 256; i++)
+                {
+                    int llXVal = FileIOHelpers.ReadInt32FromStream(fs);
+                    int llYVal = FileIOHelpers.ReadInt32FromStream(fs);
+
+                    int urXVal = FileIOHelpers.ReadInt32FromStream(fs);
+                    int urYVal = FileIOHelpers.ReadInt32FromStream(fs);
+
+                    int pos = FileIOHelpers.ReadInt32FromStream(fs);
+                    int lon = FileIOHelpers.ReadInt16FromStream(fs);
+                    int sym = FileIOHelpers.ReadInt16FromStream(fs);
+                    if (pos > 0)
+                    {
+                        ObjectIndex idx = new ObjectIndex()
+                        {
+                            LowerLeft = Coordinate.FromOcadVal(llXVal, llYVal),
+                            UpperRight = Coordinate.FromOcadVal(urXVal, urYVal),
+                            SymbolNumber = sym
+                        };
+                        objectIndexes.Add(idx);
+                    }
+                }
+
+                if (nextIdxBlock > 0)
+                {
+                    more = true;
+                    fs.Seek(nextIdxBlock, SeekOrigin.Begin);
+                }
+
+            } while (more);
+
+            return objectIndexes;
         }
     }
 }

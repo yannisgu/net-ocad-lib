@@ -8,5 +8,6 @@ namespace net_ocad_lib
     public interface IOcadFile
     {
         BaseSymbol[] Symbols { get; set; }
+        ObjectIndex[] ObjectIndexes { get; set; }
     }
 }

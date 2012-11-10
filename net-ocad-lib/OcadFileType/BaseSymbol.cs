@@ -20,7 +20,8 @@ namespace net_ocad_lib
     }
     public class LineSymbol : BaseSymbol
     {
-
+        public CmykColor LineColor { get; set; }
+        public double LineWidth { get; set; }
     }
     public class AreaSymbol : BaseSymbol
     {
