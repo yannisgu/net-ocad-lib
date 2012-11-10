@@ -38,7 +38,7 @@ namespace net_ocad_lib.OcadFileType
     //  Reserved4: longint;
     //end;
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal class Ocad8FileHeader
+    public class Ocad8FileHeader
     {
         public short OCADMark { get; set; }
         public short SectionMark { get; set; }
@@ -66,11 +66,16 @@ namespace net_ocad_lib.OcadFileType
     //                             for this index.}
     //end;
     [StructLayout( LayoutKind.Sequential, Pack = 1)]
-    internal class Ocad8SymbolIndexBlock
+    public class Ocad8SymbolIndexBlock : ISymbolIndexBlock
     {
         public int NextSymbolIndexBlock { get; set; }
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-        public int[] SymbolPosition;
+        public int[] m_SymbolPosition;
+
+        public int[] SymbolPositions()
+        {
+            return m_SymbolPosition;
+        }
     }
     
   //    TSymHeader = record
@@ -105,7 +110,7 @@ namespace net_ocad_lib.OcadFileType
   //                             use.}
   //end;
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal class Ocad8SymHeader
+    public class Ocad8SymHeader
     {
         public short nColors { get; set; }
         public short nColorSep { get; set; }
@@ -180,7 +185,7 @@ namespace net_ocad_lib.OcadFileType
   //                                 in the color dialog box)}
   //end;
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal class Ocad8ColorInfo
+    public class Ocad8ColorInfo
     {
         public short ColorNum { get; set; }
         public short Reserved { get; set; }
@@ -202,7 +207,7 @@ namespace net_ocad_lib.OcadFileType
   //  black: byte;               {dito for black}
   //end;
     [StructLayout(LayoutKind.Sequential, Pack=1)]
-    internal class Ocad8Cmyk
+    public class Ocad8Cmyk
     {
         public byte cyan { get; set; }
         public byte magenta { get; set; }
@@ -224,7 +229,7 @@ namespace net_ocad_lib.OcadFileType
   //                             Separation dialog box.}
   //end;
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal class Ocad8ColorSep
+    public class Ocad8ColorSep
     {
         [MarshalAs(UnmanagedType.AnsiBStr, SizeConst = 15)]
         public string SepName;

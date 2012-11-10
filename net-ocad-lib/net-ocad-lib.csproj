@@ -41,7 +41,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConvertHelpers.cs" />
+    <Compile Include="FileIOHelpers.cs" />
+    <Compile Include="IOcadFile.cs" />
+    <Compile Include="IOcadFileLoader.cs" />
+    <Compile Include="Loaders\OcadFileLoader.cs" />
+    <Compile Include="Loaders\Ocad10Loader.cs" />
+    <Compile Include="Loaders\Ocad8Loader.cs" />
     <Compile Include="OcadFile.cs" />
+    <Compile Include="OcadFileType\BaseSymbol.cs" />
+    <Compile Include="OcadFileType\ISymbolIndexBlock.cs" />
     <Compile Include="OcadFileType\Ocad8Types.cs" />
     <Compile Include="OcadFileType\Ocad10Types.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

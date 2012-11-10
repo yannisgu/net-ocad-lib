@@ -30,7 +30,7 @@ namespace net_ocad_lib.OcadFileType
   //  Res4: longint;             // Not used
   //end;
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal class Ocad10FileHeader
+    public class Ocad10FileHeader
     {
         public short OCADMark { get; set; }
         public byte FileType { get; set; }
@@ -54,12 +54,17 @@ namespace net_ocad_lib.OcadFileType
     // SymbolPosition: array[0..255] of integer;
     // end;
     [StructLayout( LayoutKind.Sequential, Pack = 1)]
-    internal class Ocad10SymbolIndexBlock
+    public class Ocad10SymbolIndexBlock : ISymbolIndexBlock
     {
         public int NextSymbolIndexBlock { get; set; }
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-        public int[] SymbolPosition;
+        public int[] m_SymbolPosition;
+
+        public int[] SymbolPositions()
+        {
+            return m_SymbolPosition;
+        }
     }
 
 }

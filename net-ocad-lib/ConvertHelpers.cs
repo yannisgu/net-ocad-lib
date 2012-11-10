@@ -7,7 +7,7 @@ using System.IO;
 
 namespace net_ocad_lib
 {
-    internal class ConvertHelpers
+    public class ConvertHelpers
     {
         public static T FromStream<T>(Stream s)
         {
