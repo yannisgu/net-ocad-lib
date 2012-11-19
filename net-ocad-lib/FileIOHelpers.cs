@@ -50,9 +50,9 @@ namespace net_ocad_lib
             return BitConverter.ToInt64(data, 0);
         }
 
-        public static string ReadDelphiStringFromStream(Stream s)
+        public static string ReadDelphiStringFromStream(Stream s, int len)
         {
-            byte[] data = ReadBytesFromStream(s, 32);
+            byte[] data = ReadBytesFromStream(s, len + 1);
             int numChars = (int)data[0];
             return System.Text.Encoding.GetEncoding(1252).GetString(data.Skip(1).Take(numChars).ToArray());
         }

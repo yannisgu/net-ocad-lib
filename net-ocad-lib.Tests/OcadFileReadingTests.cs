@@ -39,10 +39,15 @@ namespace net_ocad_lib.Tests
 
             FileStream fs = File.OpenRead(testfile);
             OcadFileType.Ocad8FileHeader header = ConvertHelpers.FromStream<OcadFileType.Ocad8FileHeader>(fs);
+            OcadFileType.Ocad8SymHeader symheader = OcadFileType.Ocad8SymHeader.ReadFromStream(fs);
             List<int> symbolIdx = OcadFileLoader.ReadSymbolIndexes<OcadFileType.Ocad8SymbolIndexBlock>(fs, header.FirstSymbolIndexBlock);
             Assert.AreEqual(161, symbolIdx.Count);
 
-            var symbols = Ocad8Loader.ReadSymbols(fs, symbolIdx);
+            
+             var Colors = symheader.aColorInfo.Select(x => new ColorInfo() { ColorName = x.ColorName, ColorNum = x.ColorNum, SepPercentage = x.SepPercentage, Color = new CmykColor() { black = x.Color.black, yellow = x.Color.yellow, magenta = x.Color.magenta, cyan = x.Color.cyan } }).ToArray();
+
+
+             var symbols = Ocad8Loader.ReadSymbols(fs, symbolIdx, Colors);
             VerifySymbolsInElseholm(symbols);
             fs.Close();
         }
@@ -60,11 +65,14 @@ namespace net_ocad_lib.Tests
         [Test]
         public void TestReadOcad8FileObjectFromFile()
         {
-            string testfile = getPathToTestfile("TestFiles\\Elseholm.ocd");
+            string testfile = getPathToTestfile("TestFiles\\Gunn0101.ocd");
 
             IOcadFile of = OcadFile.OpenFile(testfile);
 
-            Assert.AreEqual(389, of.ObjectIndexes.Count());
+            Assert.AreEqual(533, of.Objects.Count());
+
+            net_ocad_lib.drawing.MapDrawer.DrawMap(of, getPathToTestfile("test.png"), 1000, 3000);
+
         }
 
         private static void VerifySymbolsInElseholm(List<BaseSymbol> symbols)

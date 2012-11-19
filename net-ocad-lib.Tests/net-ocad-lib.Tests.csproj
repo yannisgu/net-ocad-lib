@@ -57,8 +57,15 @@
     <None Include="TestFiles\Elseholm.ocd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="TestFiles\Gunn0101.ocd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\net-ocad-lib.drawing\net-ocad-lib.drawing.csproj">
+      <Project>{22d9d648-8e5e-420d-8d2c-5a04c2586a43}</Project>
+      <Name>net-ocad-lib.drawing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\net-ocad-lib\net-ocad-lib.csproj">
       <Project>{dd6182d1-968b-434d-b04e-2ded7a5c72e2}</Project>
       <Name>net-ocad-lib</Name>

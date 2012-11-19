@@ -23,29 +23,77 @@ namespace net_ocad_lib.Loaders
             OcadFileType.Ocad8FileHeader header = ConvertHelpers.FromStream<OcadFileType.Ocad8FileHeader>(fs);
             //Read SYmbolheader
             OcadFileType.Ocad8SymHeader symheader = OcadFileType.Ocad8SymHeader.ReadFromStream(fs);
+
+            file.Colors = symheader.aColorInfo.Select(x => new ColorInfo() { ColorName = x.ColorName, ColorNum = x.ColorNum, SepPercentage = x.SepPercentage, Color = new CmykColor() { black = x.Color.black, yellow = x.Color.yellow, magenta = x.Color.magenta, cyan = x.Color.cyan } }).ToArray();
+
             //Read symbolindexes
             List<int> symIndexes = ReadSymbolIndexes<Ocad8SymbolIndexBlock>(fs, header.FirstSymbolIndexBlock);
-            file.Symbols = ReadSymbols(fs, symIndexes).ToArray();
+            file.Symbols = ReadSymbols(fs, symIndexes, file.Colors).ToArray();
 
-            file.ObjectIndexes = ReadObjectIndexes(fs, header.ObjectIndexBlock).ToArray();
+            file.Objects = ReadObjects(fs, header.ObjectIndexBlock).ToArray();
 
             fs.Close();
 
             return file;
         }
 
-        public static List<BaseSymbol>  ReadSymbols(FileStream fs, List<int> symIndexes)
+
+        public static List<MapObject> ReadObjects(FileStream fs, int firstIndexBlock)
+        {
+            List<MapObject> objects = new List<MapObject>();
+
+            List<ObjectIndex> objectIndexes = ReadObjectIndexes(fs, firstIndexBlock);
+
+            foreach (var idx in objectIndexes)
+            {
+                fs.Seek(idx.FilePostition, SeekOrigin.Begin);
+
+                objects.Add(ReadObject(fs));
+
+            }
+
+
+            return objects;
+        }
+
+        private static MapObject ReadObject(FileStream fs)
+        {
+            short symNr = FileIOHelpers.ReadInt16FromStream(fs);
+            int objectType = (int)fs.ReadByte();
+            bool unicode = (int)fs.ReadByte() != 0;
+            short nItem = FileIOHelpers.ReadInt16FromStream(fs);
+            short nText = FileIOHelpers.ReadInt16FromStream(fs);
+            short ang = FileIOHelpers.ReadInt16FromStream(fs);
+            short res1 = FileIOHelpers.ReadInt16FromStream(fs);
+            int resheight = FileIOHelpers.ReadInt32FromStream(fs);
+            string res2 = FileIOHelpers.ReadDelphiStringFromStream(fs, 15);
+
+            List<Coordinate> coords = new List<Coordinate>();
+            for (int i = 0; i < nItem; i++)
+            {
+                var coord = readCoord(fs);
+                coords.Add(coord);
+            }
+
+            if (objectType == 1)
+                return new PointObject() { Angle = ang, Coordinates = coords.ToArray(), SymbolNumber = symNr };
+            else if (objectType == 2)
+                return new LineObject() { Coordinates = coords.ToArray(), SymbolNumber = symNr };
+            return null;
+        }
+
+        public static List<BaseSymbol> ReadSymbols(FileStream fs, List<int> symIndexes, ColorInfo[] colors)
         {
             List<BaseSymbol> symbols = new List<BaseSymbol>();
             foreach (var idx in symIndexes)
             {
-                var bs = ReadSymbol(fs, idx);
+                var bs = ReadSymbol(fs, idx, colors);
                 symbols.Add(bs);
             }
             return symbols;
         }
 
-        public static BaseSymbol ReadSymbol(FileStream fs, int symFilePosition)
+        public static BaseSymbol ReadSymbol(FileStream fs, int symFilePosition, ColorInfo[] filecolors)
         {
             fs.Seek(symFilePosition, SeekOrigin.Begin);
             int dataSize = FileIOHelpers.ReadInt16FromStream(fs);
@@ -68,21 +116,26 @@ namespace net_ocad_lib.Loaders
 
             long filePos = FileIOHelpers.ReadInt32FromStream(fs);
             byte[] colors = FileIOHelpers.ReadBytesFromStream(fs, 32);
-            bs.Description = FileIOHelpers.ReadDelphiStringFromStream(fs);
+            bs.Description = FileIOHelpers.ReadDelphiStringFromStream(fs,31);
             bs.Icon = FileIOHelpers.ReadBytesFromStream(fs, 264);
 
             if (bs is PointSymbol)
                 readPointSymbol(bs, fs);
             else if (bs is LineSymbol)
-                readLineSymbol(bs, fs);
+                readLineSymbol(bs, fs, filecolors);
 
             return bs;
         }
 
-        private static void readLineSymbol(BaseSymbol bs, FileStream fs)
+        private static void readLineSymbol(BaseSymbol bs, FileStream fs, ColorInfo[] colors)
         {
             int col = FileIOHelpers.ReadInt16FromStream(fs);
             (bs as LineSymbol).LineWidth = FileIOHelpers.ReadInt16FromStream(fs);
+
+            if (colors.Where(x => x.ColorNum == col).Count() == 0)
+                throw new ApplicationException("cant find color " + col + " for symbol: " + bs.Description + " [" + bs.SymbolNumber + "]");
+
+            (bs as LineSymbol).LineColor = colors.Where(x => x.ColorNum == col).Select(x=>x.Color).First();
         }
 
 
@@ -125,9 +178,8 @@ namespace net_ocad_lib.Loaders
                 sEl.Coordinates = new Coordinate[numCoords];
                 for (int coord = 0; coord < numCoords; coord++)
                 {
-                    int xval = FileIOHelpers.ReadInt32FromStream(fs);
-                    int yval = FileIOHelpers.ReadInt32FromStream(fs);
-                    sEl.Coordinates[coord] = Coordinate.FromOcadVal(xval, yval);
+                    var tcoord = readCoord(fs);
+                    sEl.Coordinates[coord] = tcoord;
                     c++;
 
                 }
@@ -136,6 +188,14 @@ namespace net_ocad_lib.Loaders
             }
 
             (bs as PointSymbol).SymbolElements = symElements.ToArray();
+        }
+
+        private static Coordinate readCoord(FileStream fs)
+        {
+            int xval = FileIOHelpers.ReadInt32FromStream(fs);
+            int yval = FileIOHelpers.ReadInt32FromStream(fs);
+            var tcoord = Coordinate.FromOcadVal(xval, yval);
+            return tcoord;
         }
 
         private static BaseSymbol GetSymbolFromType(int objectType, byte symType)

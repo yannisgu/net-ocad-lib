@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using net_ocad_lib.Loaders;
+using net_ocad_lib.OcadFileType;
 
 namespace net_ocad_lib
 {
@@ -23,6 +24,8 @@ namespace net_ocad_lib
         }
 
         public BaseSymbol[] Symbols { get; set; }
-        public ObjectIndex[] ObjectIndexes { get; set; }
+        public MapObject[] Objects { get; set; }
+        public ColorInfo[] Colors { get; set; }
+
     }
 }

@@ -93,7 +93,8 @@ namespace net_ocad_lib.Loaders
                         {
                             LowerLeft = Coordinate.FromOcadVal(llXVal, llYVal),
                             UpperRight = Coordinate.FromOcadVal(urXVal, urYVal),
-                            SymbolNumber = sym
+                            SymbolNumber = sym,
+                            FilePostition = pos
                         };
                         objectIndexes.Add(idx);
                     }

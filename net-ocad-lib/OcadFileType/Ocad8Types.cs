@@ -132,33 +132,48 @@ namespace net_ocad_lib.OcadFileType
         public Ocad8ColorSep[] aColorSep;
 
 
-        internal static Ocad8SymHeader ReadFromStream(Stream s)
+        public static Ocad8SymHeader ReadFromStream(Stream s)
         {
             Ocad8SymHeader symh = new Ocad8SymHeader();
-            symh.aColorInfo = new Ocad8ColorInfo[256];
-            symh.aColorSep = new Ocad8ColorSep[32];
-            Type t = symh.GetType();
-            byte[] data = new byte[Marshal.SizeOf(symh)];
-            ConvertHelpers.ReadArrayFromStream(s, data);
+            
+            //Type t = symh.GetType();
+            //byte[] data = new byte[Marshal.SizeOf(symh)];
+            //ConvertHelpers.ReadArrayFromStream(s, data);
 
-            symh.nColors = BitConverter.ToInt16(data, 0);
-            symh.nColorSep = BitConverter.ToInt16(data, 2);
-            symh.CyanFreq = BitConverter.ToInt16(data, 4);
-            symh.CyanAng = BitConverter.ToInt16(data, 6);
-            symh.MagentaFreq= BitConverter.ToInt16(data, 8);
-            symh.MagentaAng = BitConverter.ToInt16(data, 10);
-            symh.YellowFreq = BitConverter.ToInt16(data, 12);
-            symh.YellowAng = BitConverter.ToInt16(data, 14);
-            symh.BlackFreq = BitConverter.ToInt16(data, 16);
-            symh.BlackAng = BitConverter.ToInt16(data, 18);
-            symh.Res1 = BitConverter.ToInt16(data, 20);
-            symh.Res2 = BitConverter.ToInt16(data, 22);
+            symh.nColors = FileIOHelpers.ReadInt16FromStream(s);
+            symh.nColorSep = FileIOHelpers.ReadInt16FromStream(s);
 
-            for (int i = 0; i < 256; i++)
+            symh.aColorInfo = new Ocad8ColorInfo[symh.nColors];
+            symh.aColorSep = new Ocad8ColorSep[symh.nColorSep];
+
+            symh.CyanFreq = FileIOHelpers.ReadInt16FromStream(s);
+            symh.CyanAng = FileIOHelpers.ReadInt16FromStream(s);
+            symh.MagentaFreq = FileIOHelpers.ReadInt16FromStream(s);
+            symh.MagentaAng = FileIOHelpers.ReadInt16FromStream(s);
+            symh.YellowFreq = FileIOHelpers.ReadInt16FromStream(s);
+            symh.YellowAng = FileIOHelpers.ReadInt16FromStream(s);
+            symh.BlackFreq = FileIOHelpers.ReadInt16FromStream(s);
+            symh.BlackAng = FileIOHelpers.ReadInt16FromStream(s);
+            symh.Res1 = FileIOHelpers.ReadInt16FromStream(s);
+            symh.Res2 = FileIOHelpers.ReadInt16FromStream(s);
+
+            for (int i = 0; i < Math.Min(256, (int)symh.nColors); i++)
             {
+                symh.aColorInfo[i] = new Ocad8ColorInfo();
+                symh.aColorInfo[i].ColorNum = FileIOHelpers.ReadInt16FromStream(s);
+                symh.aColorInfo[i].Reserved = FileIOHelpers.ReadInt16FromStream(s);
+
+                symh.aColorInfo[i].Color = new Ocad8Cmyk();
+                symh.aColorInfo[i].Color.cyan = FileIOHelpers.ReadBytesFromStream(s, 1)[0];
+                symh.aColorInfo[i].Color.magenta = FileIOHelpers.ReadBytesFromStream(s, 1)[0];
+                symh.aColorInfo[i].Color.yellow= FileIOHelpers.ReadBytesFromStream(s, 1)[0];
+                symh.aColorInfo[i].Color.black = FileIOHelpers.ReadBytesFromStream(s, 1)[0];
+
+                symh.aColorInfo[i].ColorName = FileIOHelpers.ReadDelphiStringFromStream(s, 31);
+                symh.aColorInfo[i].SepPercentage = FileIOHelpers.ReadBytesFromStream(s, 32);
             }
 
-            return null;            
+            return symh;            
         }
 
     }
