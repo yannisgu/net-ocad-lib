@@ -1,0 +1,1 @@
+.NET library for Reading and Writing OCAD files (see www.ocad.com)
